@@ -1,6 +1,6 @@
 const db = require("../connection");
 const format = require("pg-format");
-const {convertTimestampToDate} = require("./utils.js");
+const { convertTimestampToDate } = require("./utils.js");
 
 const seed = ({ topicData, userData, articleData, commentData }) => {
   console.log("Seeding is happening:");
@@ -36,14 +36,13 @@ const seed = ({ topicData, userData, articleData, commentData }) => {
       return insertDataTopics(topicData);
     })
     .then(() => {
-     
       return insertUsersData(userData);
     })
     .then(() => {
       return insertArticlesData(articleData);
     })
-    .then((data) => {
-      return insertCommentsData(data, commentData);
+    .then(({ rows }) => {
+      return insertCommentsData(rows, commentData);
     });
 };
 
@@ -118,7 +117,6 @@ function insertUsersData(userData) {
 
 function insertArticlesData(articleData) {
   const articles = articleData.map((article) => {
-   
     return [
       article.title,
       article.topic,
@@ -129,10 +127,7 @@ function insertArticlesData(articleData) {
       article.article_img_url,
     ];
   });
-  // votes and created_at are undefined
-  // investigate if votes are set = 0 in psql
-  // investigate how to use util function  if given a correct argument
-  
+
   return db.query(
     format(
       `INSERT INTO articles 
@@ -144,9 +139,9 @@ function insertArticlesData(articleData) {
   );
 }
 
-function insertCommentsData(data, commentData) {
+function insertCommentsData(rows, commentData) {
   const comments = commentData.map((comment) => {
-    const article = data.rows.find((article) => {
+    const article = rows.find((article) => {
       return article.title === comment.article_title;
     });
 
@@ -158,7 +153,7 @@ function insertCommentsData(data, commentData) {
       convertTimestampToDate(comment).created_at,
     ];
   });
-  console.log("Comments:",comments);
+  console.log("Comments:", comments);
   return db.query(
     format(
       `INSERT INTO comments 
