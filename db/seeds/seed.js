@@ -35,13 +35,12 @@ const seed = ({ topicData, userData, articleData, commentData }) => {
     .then(() => {
       return insertDataTopics(topicData);
     })
-    .then((topics) => {
-      // const users = insertUsersData(userData);
-      return Promise.all([insertUsersData(userData), topics]);
+    .then(() => {
+     
+      return insertUsersData(userData);
     })
-    .then((data) => {
-      // console.log("inside articles insert checking users:",data[0].rows);
-      return insertArticlesData(data[0].rows, data[1].rows, articleData);
+    .then(() => {
+      return insertArticlesData(articleData);
     })
     .then((data) => {
       return insertCommentsData(data, commentData);
@@ -117,26 +116,23 @@ function insertUsersData(userData) {
   );
 }
 
-function insertArticlesData(users, topics, articleData) {
+function insertArticlesData(articleData) {
   const articles = articleData.map((article) => {
-    const topic = topics.find((topic) => {
-      return article.topic === topic.slug;
-    });
-
-    const author = users.map((user) => {
-      return user.username === article.author;
-    });
+   
     return [
       article.title,
-      topic.slug,
-      author.username,
+      article.topic,
+      article.author,
       article.body,
-      convertTimestampToDate(article.created_at).created_at,
-      article.votes,
+      convertTimestampToDate(article).created_at,
+      article.votes === null ? 0 : article.votes,
       article.article_img_url,
     ];
   });
-
+  // votes and created_at are undefined
+  // investigate if votes are set = 0 in psql
+  // investigate how to use util function  if given a correct argument
+  
   return db.query(
     format(
       `INSERT INTO articles 
@@ -158,11 +154,11 @@ function insertCommentsData(data, commentData) {
       article.article_id,
       comment.body,
       comment.votes,
-      article.author,
-      convertTimestampToDate(comment.created_at).created_at,
+      comment.author,
+      convertTimestampToDate(comment).created_at,
     ];
   });
-
+  console.log("Comments:",comments);
   return db.query(
     format(
       `INSERT INTO comments 
