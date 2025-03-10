@@ -27,17 +27,24 @@ describe("GET /api", () => {
   });
 });
 
-describe.only("GET api/topics", () => {
+describe("GET api/topics", () => {
   test("200: Responds with all the topics present", () => {
     return request(app)
       .get("/api/topics")
       .expect(200)
       .then(({body: {topics}}) => {
-        console.log(topics);
         expect(topics.length).toBe(3);
         topics.forEach((topic) => {
           expect(typeof topic.slug).toBe('string');
         })
+      });
+  });
+  test("404: Responds with all the topics present when given wrong url", () => {
+    return request(app)
+      .get("/api/topicss")
+      .expect(404)
+      .then((error) => {
+        expect(error.status).toBe(404);
       });
   });
 });

@@ -1,11 +1,9 @@
-const db = require("../db/connection")
+const db = require("../db/connection");
 
 const fetchTopics = () => {
-    return db.query("Select * from topics;")
-           .then(({rows}) => {
-            console.log(rows);
-                return rows;
-           })
-}
+  return db.query("Select slug,description from topics;").then(({ rows }) => {
+    return rows;
+  });
+};
 
-module.exports = {fetchTopics}
+module.exports = { fetchTopics };
