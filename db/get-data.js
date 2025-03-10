@@ -19,9 +19,7 @@ const questions = [
 ];
 
 getData = (tableName) => {
-  return db.query(`select * from ${tableName};`).then((data) => {
-    console.log(data.rows);
-  });
+  return db.query(`select * from ${tableName};`).then((data) => {});
 };
 seed({ topicData, userData, articleData, commentData })
   .then(() => {
