@@ -84,7 +84,6 @@ function createTableComments() {
 }
 
 function insertDataTopics(topicData) {
-  console.log(topicData);
   const topics = topicData.map((topic) => {
     return [topic.slug, topic.description, topic.img_url];
   });
@@ -100,7 +99,6 @@ function insertDataTopics(topicData) {
 }
 
 function insertUsersData(userData) {
-  // console.log(userData);
   const users = userData.map((user) => {
     return [user.username, user.name, user.avatar_url];
   });
@@ -153,7 +151,6 @@ function insertCommentsData(rows, commentData) {
       convertTimestampToDate(comment).created_at,
     ];
   });
-  console.log("Comments:", comments);
   return db.query(
     format(
       `INSERT INTO comments 
