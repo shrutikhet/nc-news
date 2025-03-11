@@ -2,11 +2,14 @@ const express = require("express");
 
 const app = express();
 
-const { getEndpoints, handleNonExistentEndpoint } = require("./controller/api.controller");
+const {
+  getEndpoints,
+  handleNonExistentEndpoint,
+} = require("./controller/api.controller");
 
 const { getTopics } = require("./controller/topics.controller");
 
-const { getArticles } = require("./controller/articles.controller");
+const { getArticles, getArticlesById } = require("./controller/articles.controller");
 
 //app.use(express.json());
 
@@ -14,13 +17,21 @@ app.get("/api", getEndpoints);
 
 app.get("/api/topics", getTopics);
 
-app.get("/api/articles/:article_id", getArticles);
+app.get("/api/articles/:article_id", getArticlesById);
 
-app.all("/*", handleNonExistentEndpoint)
+app.get("/api/articles", getArticles);
+
+
+
+app.all("/*", handleNonExistentEndpoint);
 
 app.use((err, req, res, next) => {
-    console.log("Error:", err.code);
-})
+   if(err.status === 404)  {
+  res.status(err.status).send({ msg: err.msg });
+   } else {
+    next(err);
+   }
+});
 
 app.use((err, req, res, next) => {
   console.log("error 22P02");
