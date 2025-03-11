@@ -6,8 +6,8 @@ const getEndpoints = (request,response) => {
 }
 
 const handleNonExistentEndpoint = (request,response) => {
-    console.log("inside handle non existing endpoint")
-    response.status(404).send({msg: "Invalid Endpoint!!"});
+    console.log("inside handle non existing endpoint",request.url)
+    response.status(404).send({msg: `Invalid Endpoint!!`});
 }
 
 const handleNonExistentInfo = (request,response) => {

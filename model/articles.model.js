@@ -1,12 +1,34 @@
-const db = require("../db/connection")
+const db = require("../db/connection");
 
+const fetchArticles = (sort) => {
+  let queryString = `SELECT * FROM articles `;
+  const queryParams = [];
 
-const fetchArticles = (article_id) => {
-    return db.query(`SELECT * FROM articles WHERE article_id = $1;`,[article_id])
-        .then(({rows}) => {
-            console.log("fetching articles:", rows);
-            return rows;
-        })
-}
+  if (sort) {
+    console.log("we have sort condition", sort);
+    queryString += ` order by ${sort} desc`;
+    queryParams.push(sort);
+  }
+  return db.query(`${queryString};`).then(({ rows }) => {
+    console.log("The articles are sorted", rows);
+    return rows;
+  });
+};
 
-module.exports = {fetchArticles}
+const fetchArticlesById = (article_id) => {
+  console.log("fetching articles for article ID:", article_id);
+  let queryString = `SELECT * FROM articles `;
+  const queryParams = [];
+
+  if (article_id) {
+    console.log("we have article id:", article_id);
+    queryString += `WHERE article_id = $1`;
+    queryParams.push(article_id);
+  }
+  return db.query(`${queryString};`, queryParams).then(({ rows }) => {
+    console.log("The articles we have received:", rows);
+    return rows[0];
+  });
+};
+
+module.exports = { fetchArticles, fetchArticlesById };
