@@ -7,23 +7,23 @@ const seed = ({ topicData, userData, articleData, commentData }) => {
   return db
     .query("DROP TABLE IF EXISTS comments;")
     .then(() => {
-      console.log("Dropping table comments and articles if exists");
+      //console.log("Dropping table comments and articles if exists");
       return db.query("DROP TABLE IF EXISTS articles;");
     })
     .then(() => {
-      console.log("Dropping table topics");
+      //console.log("Dropping table topics");
       return db.query("DROP TABLE IF EXISTS topics;");
     })
     .then(() => {
-      console.log("Dropping table users");
+      //console.log("Dropping table users");
       return db.query("DROP TABLE IF EXISTS users;");
     })
     .then(() => {
-      console.log("Creating topics");
+      //console.log("Creating topics");
       return createTableTopics();
     })
     .then(() => {
-      console.log("Creating users");
+      //console.log("Creating users");
       return createTableUsers();
     })
     .then(() => {

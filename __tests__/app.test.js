@@ -36,15 +36,61 @@ describe("GET api/topics", () => {
         expect(topics.length).toBe(3);
         topics.forEach((topic) => {
           expect(typeof topic.slug).toBe('string');
+          expect(typeof topic.description).toBe('string');
         })
       });
   });
-  test("404: Responds with all the topics present when given wrong url", () => {
-    return request(app)
-      .get("/api/topicss")
-      .expect(404)
-      .then((error) => {
-        expect(error.status).toBe(404);
-      });
-  });
+  
 });
+
+describe("GET api/topicss", () => {
+test("404: Responds with error saying Not Found!!", () => {
+  return request(app)
+    .get("/api/topicss")
+    .expect(404)
+    .then((error) => {
+      expect(error.status).toBe(404);
+    });
+});
+})
+
+describe("GET /api/articles/:article_id",() => {
+  test("200: Responds with the article present for the article id given", () => {
+    return request(app)
+          .get("/api/articles/2")
+          .expect(200)
+          .then(({body: {articles}}) => {
+            console.log("articles are :",articles);
+            expect(articles.length).toBe(1);
+            articles.forEach((article) => {
+              expect(article.article_id).toBe(2);
+              expect(typeof article.title).toBe('string');
+              expect(typeof article.topic).toBe('string');
+              expect(typeof article.body).toBe('string');
+              expect(typeof article.votes).toBe('number');
+              expect(typeof article.author).toBe('string');
+              expect(typeof article.article_img_url).toBe('string');
+            })
+          })
+  })
+  test("404: /api/articles/999999 Responds with non found", () => {
+    return request(app)
+          .get("/api/articles/999999")
+          .expect(404)
+          .then((error) => {
+            expect(error.status).toBe(404);
+          })
+  })
+})
+
+  describe("GET /api/article/:article_id",() => {
+    test("404: api not found", () => {
+      return request(app)
+            .get("/api/article/1")
+            .expect(404)
+            .then((error) => {
+              expect(error.status).toBe(404);
+             })
+    })
+
+})
