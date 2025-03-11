@@ -5,4 +5,14 @@ const getEndpoints = (request,response) => {
     response.status(200).send({endpoints})
 }
 
-module.exports = {getEndpoints};
+const handleNonExistentEndpoint = (request,response) => {
+    console.log("inside handle non existing endpoint")
+    response.status(404).send({msg: "Invalid Endpoint!!"});
+}
+
+const handleNonExistentInfo = (request,response) => {
+    console.log("inside handle non existing data")
+    response.status(404).send({msg: "No Data Found!!"});
+}
+
+module.exports = {getEndpoints,handleNonExistentEndpoint,handleNonExistentInfo};
