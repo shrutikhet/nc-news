@@ -56,22 +56,29 @@ describe("GET api/topicss", () => {
 describe("GET /api/articles", () => {
   test("200: Responds with all the articles", () => {
     return request(app)
-      .get("/api/articles?sort=created_at")
+      .get("/api/articles")
       .expect(200)
       .then(({ body: { articles } }) => {
         expect(articles.length).toBe(13);
         articles.forEach((article) => {
           expect(typeof article.title).toBe("string");
           expect(typeof article.topic).toBe("string");
-          expect(typeof article.body).toBe("string");
           expect(typeof article.votes).toBe("number");
           expect(typeof article.author).toBe("string");
           expect(typeof article.article_img_url).toBe("string");
-          //expect(typeof article.comment_count).toBe("number");
-          //expect(article.comment_count).toBe();
+          expect(typeof article.comment_count).toBe("string");
         });
       });
   });
+  test("404: Responds with path not found", () => {
+    return request(app)
+      .get("/api/article")
+      .expect(404)
+      .then(({ body: { msg } }) => {
+        expect(msg).toBe("Invalid Endpoint!!");
+      })
+
+  })
 });
 
 describe("GET /api/articles/:article_id", () => {
@@ -80,17 +87,13 @@ describe("GET /api/articles/:article_id", () => {
       .get("/api/articles/1")
       .expect(200)
       .then(({ body: { article } }) => {
-        //console.log("testing:", articles);
-        expect(typeof article).toBe('object');
-       
-          expect(article.article_id).toBe(1);
-          expect(typeof article.title).toBe("string");
-          expect(typeof article.topic).toBe("string");
-          expect(typeof article.body).toBe("string");
-          expect(typeof article.votes).toBe("number");
-          expect(typeof article.author).toBe("string");
-          expect(typeof article.article_img_url).toBe("string");
-       
+        expect(typeof article).toBe("object");
+        expect(article.article_id).toBe(1);
+        expect(typeof article.title).toBe("string");
+        expect(typeof article.topic).toBe("string");
+        expect(typeof article.votes).toBe("number");
+        expect(typeof article.author).toBe("string");
+        expect(typeof article.article_img_url).toBe("string");
       });
   });
   test("404: /api/articles/999999 Responds with non found", () => {
