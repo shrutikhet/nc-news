@@ -10,6 +10,7 @@ const {
 const { getTopics } = require("./controller/topics.controller");
 
 const { getArticles, getArticlesById } = require("./controller/articles.controller");
+const { getCommentsForArticle } = require("./controller/comments.controller");
 
 //app.use(express.json());
 
@@ -21,7 +22,7 @@ app.get("/api/articles/:article_id", getArticlesById);
 
 app.get("/api/articles", getArticles);
 
-
+app.get("/api/articles/:article_id/comments", getCommentsForArticle);
 
 app.all("/*", handleNonExistentEndpoint);
 
@@ -34,15 +35,13 @@ app.use((err, req, res, next) => {
 });
 
 app.use((err, req, res, next) => {
-  console.log("error 22P02");
   if (err.code === "22P02") {
-    res.status(400).send({ msg: "Invalid input" });
+    res.status(400).send({ msg: "Bad Request!!" });
   } else next(err);
 });
 
 app.use((err, req, res, next) => {
-  console.log("Server Error");
-  console.log(err);
+  console.log("Error is:",err); 
   res.status(500).send({ msg: "Server Error!" });
 });
 

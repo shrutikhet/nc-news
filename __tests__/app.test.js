@@ -76,9 +76,8 @@ describe("GET /api/articles", () => {
       .expect(404)
       .then(({ body: { msg } }) => {
         expect(msg).toBe("Invalid Endpoint!!");
-      })
-
-  })
+      });
+  });
 });
 
 describe("GET /api/articles/:article_id", () => {
@@ -115,4 +114,40 @@ describe("GET /api/article/:article_id", () => {
         expect(error.status).toBe(404);
       });
   });
+});
+
+describe("GET /api/articles/:article_id/comments", () => {
+  test("200: Responds with comments for article 1", () => {
+    return request(app)
+      .get("/api/articles/1/comments")
+      .expect(200)
+      .then(({ body: { comments } }) => {
+        expect(comments.length).toBe(11);
+        comments.forEach((comment) => {
+          expect(comment.article_id).toBe(1);
+          expect(typeof comment.comment_id).toBe("number");
+          expect(typeof comment.votes).toBe("number");
+          expect(typeof comment.author).toBe("string");
+          expect(typeof comment.body).toBe("string");
+          expect(typeof comment.article_id).toBe("number");
+        });
+      });
+  });
+  test("404: Responds with not found when passed with incorrect value", () => {
+    return request(app)
+      .get("/api/articles/89/comments")
+      .expect(404)
+      .then(({ body: { msg } }) => {
+        expect(msg).toBe("Comments not Found!!");
+      });
+  });
+
+  test("404: Responds with not found when passed with incorrect value" ,() => {
+    return request(app)
+          .get("/api/articles/sdfj/comments")
+          .expect(400)
+          .then(({body: {msg}}) => {
+            expect(msg).toBe('Bad Request!!');
+          })
+  })
 });
