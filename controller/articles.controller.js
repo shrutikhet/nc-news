@@ -2,13 +2,9 @@ const { fetchArticles, fetchArticlesById } = require("../model/articles.model");
 //const { handleNonExistentInfo } = require("./api.controller");
 
 const getArticles = (request, response, next) => {
-  console.log("getArticles");
 
-  const { sort } = request.query;
 
-  console.log("query is:", request.query);
-
-  fetchArticles(sort)
+  fetchArticles()
     .then((rows) => {
       console.log("getting articles:", rows);
       if (rows.length === 0) {
@@ -25,6 +21,9 @@ const getArticles = (request, response, next) => {
 const getArticlesById = (request, response, next) => {
   console.log("getArticlesById");
   const { article_id } = request.params;
+  if (article_id) {
+
+  }
 
   fetchArticlesById(article_id)
     .then((row) => {
