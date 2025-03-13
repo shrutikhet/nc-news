@@ -9,10 +9,17 @@ const {
 
 const { getTopics } = require("./controller/topics.controller");
 
-const { getArticles, getArticlesById } = require("./controller/articles.controller");
-const { getCommentsForArticle } = require("./controller/comments.controller");
+const {
+  getArticles,
+  getArticlesById,
+  updateArticleVotes
+} = require("./controller/articles.controller");
+const {
+  getCommentsForArticle,
+  addCommentsForArticle
+} = require("./controller/comments.controller");
 
-//app.use(express.json());
+app.use(express.json());
 
 app.get("/api", getEndpoints);
 
@@ -24,24 +31,31 @@ app.get("/api/articles", getArticles);
 
 app.get("/api/articles/:article_id/comments", getCommentsForArticle);
 
+app.post("/api/articles/:article_id/comments", addCommentsForArticle);
+
+app.patch("/api/articles/:article_id", updateArticleVotes)
+
 app.all("/*", handleNonExistentEndpoint);
 
 app.use((err, req, res, next) => {
-   if(err.status === 404)  {
-  res.status(err.status).send({ msg: err.msg });
-   } else {
+  console.log("Error Code:", err.code, err.status);
+  if (err.status === 404 || err.status === 400) {
+    res.status(err.status).send({ msg: err.msg });
+  } else {
     next(err);
-   }
+  }
 });
 
 app.use((err, req, res, next) => {
+  console.log("Error Code:", err.code, err.status);
   if (err.code === "22P02") {
     res.status(400).send({ msg: "Bad Request!!" });
   } else next(err);
 });
 
 app.use((err, req, res, next) => {
-  console.log("Error is:",err); 
+  console.log("Error is:", err.code, err.status);
+  console.log(err);
   res.status(500).send({ msg: "Server Error!" });
 });
 

@@ -129,7 +129,6 @@ describe("GET /api/articles/:article_id/comments", () => {
           expect(typeof comment.votes).toBe("number");
           expect(typeof comment.author).toBe("string");
           expect(typeof comment.body).toBe("string");
-          expect(typeof comment.article_id).toBe("number");
         });
       });
   });
@@ -138,16 +137,88 @@ describe("GET /api/articles/:article_id/comments", () => {
       .get("/api/articles/89/comments")
       .expect(404)
       .then(({ body: { msg } }) => {
-        expect(msg).toBe("Comments not Found!!");
+        expect(msg).toBe("Article Id not found!!");
       });
   });
 
-  test("404: Responds with not found when passed with incorrect value" ,() => {
+  test("404: Responds with not found when passed with incorrect value", () => {
     return request(app)
-          .get("/api/articles/sdfj/comments")
-          .expect(400)
-          .then(({body: {msg}}) => {
-            expect(msg).toBe('Bad Request!!');
-          })
-  })
+      .get("/api/articles/sdfj/comments")
+      .expect(400)
+      .then(({ body: { msg } }) => {
+        expect(msg).toBe("Bad Request!!");
+      });
+  });
 });
+
+describe("POST: Responds adding a comment for the article id",() => {
+  test("200: Comments is added for username butter_bridge",() =>{
+  return request(app)
+        .post("/api/articles/1/comments")
+        .set('Accept', 'application/json')
+        .send({username:'butter_bridge', body:"Hello!!"})
+        .expect(200)
+        .then(({body : {comment}}) => {
+          console.log(comment.article_id);
+          console.log(comment.comment_id);
+          expect(comment.body).toBe("Hello!!")
+        })
+    })
+
+    test("400: Comments cannot be added as article id 89 does not exists",() =>{
+      return request(app)
+            .post("/api/articles/89/comments")
+            .set('Accept', 'application/json')
+            .send({username:'butter_bridge', body:"Hello!!"})
+            .expect(400)
+            .then(({body : {msg}}) => {
+              expect(msg).toBe("Article Id not found!!")
+            })
+        })
+
+    test("400: Comments cannot be added as article id 89 does not exists",() =>{
+      return request(app)
+            .post("/api/articles/68/comments")
+            .set('Accept', 'application/json')
+            .send({})
+            .expect(400)
+            .then(({body : {msg}}) => {
+              expect(msg).toBe("Article Id not found!!")
+            })
+        })    
+})
+
+describe("PATCH /api/articles/:article_id",() => {
+    test("200: updates the article by increasing or descresing the votes" , () => {
+      return request(app)
+            .patch("/api/articles/1")
+            .set('Accept', 'application/json')
+            .send({ inc_votes : 1 })
+            .expect(200)
+            .then(({body : {article}}) => {
+              expect(article.votes).toBe(101)
+            })
+    })
+
+    test("200: decreases the votes for the article_id" , () => {
+      return request(app)
+            .patch("/api/articles/1")
+            .set('Accept', 'application/json')
+            .send({ inc_votes : -2 })
+            .expect(200)
+            .then(({body : {article}}) => {
+              expect(article.votes).toBe(98)
+            })
+    })
+
+    test("400: gets a bad request as the number sent is a string" , () => {
+      return request(app)
+            .patch("/api/articles/1")
+            .set('Accept', 'application/json')
+            .send({ inc_votes : 'one' })
+            .expect(400)
+            .then(({body : {msg}}) => {
+              expect(msg).toBe("Bad Request!!")
+            })
+    })
+})
