@@ -46,7 +46,6 @@ const addCommentsForArticle = (request, response, next) => {
         console.log("error inside catch:", err);
         next(err);
       });
-  } else {
   }
 };
 
