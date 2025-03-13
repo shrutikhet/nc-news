@@ -1,9 +1,23 @@
 const db = require("../db/connection");
 
-const fetchArticles = () => {
-  let queryString = `SELECT articles.article_id,articles.title,articles.topic,articles.author,articles.created_at,articles.votes,articles.article_img_url,COUNT(COMMENTS.ARTICLE_ID) as comment_count FROM articles LEFT JOIN comments ON articles.article_id = comments.article_id GROUP BY articles.article_id ORDER BY articles.created_at desc`;
+const fetchArticles = (sort_by, order) => {
+  
 
-  return db.query(queryString).then(({ rows }) => {
+  let selectQuery = `SELECT articles.article_id,articles.title,articles.topic,articles.author,articles.created_at,articles.votes,articles.article_img_url,COUNT(COMMENTS.ARTICLE_ID) as comment_count FROM articles LEFT JOIN comments ON articles.article_id = comments.article_id `;
+
+  const groupByQuery = `GROUP BY articles.article_id `;
+
+  let orderByQuery = `ORDER BY articles.created_at desc`;
+
+  if (sort_by && order) {
+    orderByQuery = `ORDER BY articles.${sort_by} ${order}`;
+  }
+
+  selectQuery += groupByQuery + orderByQuery;
+
+  console.log(selectQuery);
+
+  return db.query(selectQuery).then(({ rows }) => {
     return rows;
   });
 };

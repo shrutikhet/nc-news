@@ -78,6 +78,24 @@ describe("GET /api/articles", () => {
         expect(msg).toBe("Invalid Endpoint!!");
       });
   });
+  test("200: Responds with all the articles with sort order votes order by desc", () => {
+    return request(app)
+      .get("/api/articles?sort_by=votes&&order=desc")
+      .expect(200)
+      .then(({ body: { articles } }) => {
+        console.log(articles);
+        expect(articles.length).toBe(13);
+        expect(articles[0].votes>= articles[1].votes).toBe(true);
+        articles.forEach((article) => {
+          expect(typeof article.title).toBe("string");
+          expect(typeof article.topic).toBe("string");
+          expect(typeof article.votes).toBe("number");
+          expect(typeof article.author).toBe("string");
+          expect(typeof article.article_img_url).toBe("string");
+          expect(typeof article.comment_count).toBe("string");
+        });
+      });
+  });
 });
 
 describe("GET /api/articles/:article_id", () => {
@@ -283,3 +301,9 @@ describe("GET /api/users", () => {
       });
   });
 });
+
+describe("", () => {
+  test("" , () => {
+
+  })
+})
