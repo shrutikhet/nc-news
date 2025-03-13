@@ -151,74 +151,135 @@ describe("GET /api/articles/:article_id/comments", () => {
   });
 });
 
-describe("POST: Responds adding a comment for the article id",() => {
-  test("200: Comments is added for username butter_bridge",() =>{
-  return request(app)
-        .post("/api/articles/1/comments")
-        .set('Accept', 'application/json')
-        .send({username:'butter_bridge', body:"Hello!!"})
-        .expect(200)
-        .then(({body : {comment}}) => {
-          console.log(comment.article_id);
-          console.log(comment.comment_id);
-          expect(comment.body).toBe("Hello!!")
-        })
-    })
+describe("POST: Responds adding a comment for the article id", () => {
+  test("201: Comments is added for username butter_bridge", () => {
+    return request(app)
+      .post("/api/articles/1/comments")
+      .set("Accept", "application/json")
+      .send({ username: "butter_bridge", body: "Hello!!" })
+      .expect(201)
+      .then(({ body: { comment } }) => {
+        expect(comment.body).toBe("Hello!!");
+      });
+  });
 
-    test("400: Comments cannot be added as article id 89 does not exists",() =>{
-      return request(app)
-            .post("/api/articles/89/comments")
-            .set('Accept', 'application/json')
-            .send({username:'butter_bridge', body:"Hello!!"})
-            .expect(400)
-            .then(({body : {msg}}) => {
-              expect(msg).toBe("Article Id not found!!")
-            })
-        })
+  test("400: Comments being added for user that does not exists", () => {
+    return request(app)
+      .post("/api/articles/1/comments")
+      .set("Accept", "application/json")
+      .send({ username: "shruti", body: "Hello!!" })
+      .expect(400)
+      .then(({ body: { msg } }) => {
+        expect(msg).toBe("shruti does not exists!! Create first");
+      });
+  });
 
-    test("400: Comments cannot be added as article id 89 does not exists",() =>{
-      return request(app)
-            .post("/api/articles/68/comments")
-            .set('Accept', 'application/json')
-            .send({})
-            .expect(400)
-            .then(({body : {msg}}) => {
-              expect(msg).toBe("Article Id not found!!")
-            })
-        })    
-})
+  test("404: Comments cannot be added as article id 89 does not exists", () => {
+    return request(app)
+      .post("/api/articles/89/comments")
+      .set("Accept", "application/json")
+      .send({ username: "butter_bridge", body: "Hello!!" })
+      .expect(404)
+      .then(({ body: { msg } }) => {
+        expect(msg).toBe("Article Id not found!!");
+      });
+  });
 
-describe("PATCH /api/articles/:article_id",() => {
-    test("200: updates the article by increasing or descresing the votes" , () => {
-      return request(app)
-            .patch("/api/articles/1")
-            .set('Accept', 'application/json')
-            .send({ inc_votes : 1 })
-            .expect(200)
-            .then(({body : {article}}) => {
-              expect(article.votes).toBe(101)
-            })
-    })
+  test("400: Comments cannot be added as there is no body", () => {
+    return request(app)
+      .post("/api/articles/2/comments")
+      .set("Accept", "application/json")
+      .send({})
+      .expect(400)
+      .then(({ body: { msg } }) => {
+        expect(msg).toBe("Username does not exists!!");
+      });
+  });
+});
 
-    test("200: decreases the votes for the article_id" , () => {
-      return request(app)
-            .patch("/api/articles/1")
-            .set('Accept', 'application/json')
-            .send({ inc_votes : -2 })
-            .expect(200)
-            .then(({body : {article}}) => {
-              expect(article.votes).toBe(98)
-            })
-    })
+describe("PATCH /api/articles/:article_id", () => {
+  test("200: updates the article by increasing or descresing the votes", () => {
+    return request(app)
+      .patch("/api/articles/1")
+      .set("Accept", "application/json")
+      .send({ inc_votes: 1 })
+      .expect(200)
+      .then(({ body: { article } }) => {
+        expect(article.votes).toBe(101);
+      });
+  });
 
-    test("400: gets a bad request as the number sent is a string" , () => {
-      return request(app)
-            .patch("/api/articles/1")
-            .set('Accept', 'application/json')
-            .send({ inc_votes : 'one' })
-            .expect(400)
-            .then(({body : {msg}}) => {
-              expect(msg).toBe("Bad Request!!")
-            })
-    })
-})
+  test("200: decreases the votes for the article_id", () => {
+    return request(app)
+      .patch("/api/articles/1")
+      .set("Accept", "application/json")
+      .send({ inc_votes: -2 })
+      .expect(200)
+      .then(({ body: { article } }) => {
+        expect(article.votes).toBe(98);
+      });
+  });
+
+  test("400: gets a bad request as the number sent is a string", () => {
+    return request(app)
+      .patch("/api/articles/1")
+      .set("Accept", "application/json")
+      .send({ inc_votes: "one" })
+      .expect(400)
+      .then(({ body: { msg } }) => {
+        expect(msg).toBe("Bad Request!!");
+      });
+  });
+
+  test("400: gets a bad request as article_id does not exists", () => {
+    return request(app)
+      .patch("/api/articles/89")
+      .set("Accept", "application/json")
+      .send({ inc_votes: "1" })
+      .expect(400)
+      .then(({ body: { msg } }) => {
+        expect(msg).toBe("Article id does not exists");
+      });
+  });
+});
+
+describe("DELETE /api/comments/:comment_id", () => {
+  test("204 deletes the comments for comment id", () => {
+    return request(app)
+      .delete("/api/comments/1")
+      .expect(204);
+  });
+
+  test("404: comment id to be deleted not found", () => {
+    return request(app)
+      .delete("/api/comments/900")
+      .expect(404)
+      .then(({body: {msg}}) => {
+        expect(msg).toBe("Not Found");
+      });
+  });
+
+  test("400: comment id is in wrong format", () => {
+    return request(app)
+      .delete("/api/comments/one")
+      .expect(400)
+      .then(({body: {msg}}) => {
+        expect(msg).toBe("Bad Request!!");
+      });
+  });
+});
+
+describe("GET /api/users", () => {
+  test("200: gets all the users", () => {
+    return request(app)
+      .get("/api/users")
+      .expect(200)
+      .then(({ body: { users } }) => {
+        users.forEach((user) => {
+          expect(typeof user.username).toBe("string");
+          expect(typeof user.name).toBe("string");
+          expect(typeof user.avatar_url).toBe("string");
+        });
+      });
+  });
+});
