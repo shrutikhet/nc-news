@@ -16,8 +16,10 @@ const {
 } = require("./controller/articles.controller");
 const {
   getCommentsForArticle,
-  addCommentsForArticle
+  addCommentsForArticle,
+  deleteComment
 } = require("./controller/comments.controller");
+const { allUsers } = require("./controller/users.controller");
 
 app.use(express.json());
 
@@ -34,6 +36,10 @@ app.get("/api/articles/:article_id/comments", getCommentsForArticle);
 app.post("/api/articles/:article_id/comments", addCommentsForArticle);
 
 app.patch("/api/articles/:article_id", updateArticleVotes)
+
+app.delete("/api/comments/:comment_id", deleteComment)
+
+app.get("/api/users", allUsers )
 
 app.all("/*", handleNonExistentEndpoint);
 

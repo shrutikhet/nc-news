@@ -2,6 +2,7 @@ const { isArticleIdValid } = require("../model/articles.model");
 const {
   fetchCommentsForArticleId,
   insertCommentsForArticle,
+  deleteCommentQuery,
 } = require("../model/comment.model");
 
 const getCommentsForArticle = (request, response, next) => {
@@ -35,20 +36,41 @@ const addCommentsForArticle = (request, response, next) => {
         if (isValid) {
           return insertCommentsForArticle(article_id, username, body);
         } else {
-            return Promise.reject({ status: 400, msg: "Article Id not found!!" })
+          return Promise.reject({ status: 404, msg: "Article Id not found!!" });
         }
       })
       .then((comment) => {
-        response.status(200).send({ comment });
-       
+        response.status(201).send({ comment });
       })
       .catch((err) => {
-        console.log("error inside catch:",err);
+        console.log("error inside catch:", err);
         next(err);
       });
-  } else {
-
   }
 };
 
-module.exports = { getCommentsForArticle, addCommentsForArticle };
+const deleteComment = (request, response, next) => {
+  const { comment_id } = request.params;
+  if (comment_id) {
+    deleteCommentQuery(comment_id)
+      .then((rows) => {
+        console.log("In controller after deletion:", rows);
+        if (rows && rows.length === 0) {
+          return Promise.reject({
+            status: 404,
+            msg: "Not Found",
+          });
+        }
+        response.status(204).send({});
+      })
+      .catch((err) => {
+        next(err);
+      });
+  }
+};
+
+module.exports = {
+  getCommentsForArticle,
+  addCommentsForArticle,
+  deleteComment,
+};

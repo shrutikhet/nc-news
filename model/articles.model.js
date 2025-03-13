@@ -22,24 +22,33 @@ const fetchArticlesById = (article_id) => {
 };
 
 const isArticleIdValid = (article_id) => {
-    console.log("isArticleIdValid:",article_id);
-    return db.query(`SELECT * FROM articles WHERE article_id = $1`,[article_id])
-        .then(({rows})=> {
-            if(rows.length === 0) {
-                console.log("not valid:",article_id);
-                return false;
-            }
-            return true;
-        })
-}
+  return db
+    .query(`SELECT * FROM articles WHERE article_id = $1`, [article_id])
+    .then(({ rows }) => {
+      if (rows.length === 0) {
+        return false;
+      }
+      return true;
+    });
+};
 
 const updateVotesForArticleId = (article_id, inc_votes) => {
-    return db.query(`UPDATE articles 
+  return db
+    .query(
+      `UPDATE articles 
                     SET votes = votes + $1
-                    WHERE article_id = $2 RETURNING *`,[inc_votes,article_id])
-        .then(({rows}) => {
-            return rows[0];
-        })
-}
+                    WHERE article_id = $2 RETURNING *`,
+      [inc_votes, article_id]
+    )
+    .then(({ rows }) => {
+      console.log("Updated rows are :", rows);
+      return rows;
+    });
+};
 
-module.exports = { fetchArticles, fetchArticlesById, isArticleIdValid, updateVotesForArticleId };
+module.exports = {
+  fetchArticles,
+  fetchArticlesById,
+  isArticleIdValid,
+  updateVotesForArticleId,
+};

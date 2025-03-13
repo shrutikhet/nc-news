@@ -33,13 +33,21 @@ const getArticlesById = (request, response, next) => {
 const updateArticleVotes = (request,response,next) => {
     const {inc_votes} = request.body;
     const {article_id} = request.params;
-    updateVotesForArticleId(article_id,inc_votes)
-    .then((article) => {
-        response.status(200).send({article});
-    })
-    .catch((err) => {
-        next(err);
-    })  
+    if(article_id && inc_votes) {
+         updateVotesForArticleId(article_id,inc_votes)
+        .then((article) => {
+            if(article.length !== 0) {
+                response.status(200).send({article: article[0]});
+            } else {
+                return Promise.reject({status: 400, msg: 'Article id does not exists'});
+            }
+        })
+        .catch((err) => {
+            next(err);
+        })  
+    } else {
+         Promise.reject({status: 400, msg: 'Bad Request!!'})
+    }
 
 }
 module.exports = { getArticles, getArticlesById, updateArticleVotes };
