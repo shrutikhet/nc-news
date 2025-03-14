@@ -35,11 +35,14 @@
     "dotenv": "^16.4.7",
     "express": "^4.21.2",
     "inquirer": "^8.0.0",
+    "jest-sorted": "^1.0.15",
+    "nodemon": "^3.1.9",
     "pg": "^8.13.3"
   },
   "jest": {
     "setupFilesAfterEnv": [
-      "jest-extended/all", "jest-sorted"
+      "jest-extended/all",
+      "jest-sorted"
     ]
   }
 }
