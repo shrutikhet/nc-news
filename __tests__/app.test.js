@@ -96,6 +96,34 @@ describe("GET /api/articles", () => {
         });
       });
   });
+
+  test("200: Responds with all the articles with the value of topic", () => {
+    return request(app)
+      .get("/api/articles?column_name=topic&&value=mitch")
+      .expect(200)
+      .then(({ body: { articles } }) => {
+        console.log(articles);
+        expect(articles.length).toBe(12);
+        expect(articles[0].votes>= articles[1].votes).toBe(true);
+        articles.forEach((article) => {
+          expect(typeof article.title).toBe("string");
+          expect(article.topic).toBe("mitch");
+          expect(typeof article.votes).toBe("number");
+          expect(typeof article.author).toBe("string");
+          expect(typeof article.article_img_url).toBe("string");
+          expect(typeof article.comment_count).toBe("string");
+        });
+      });
+  });
+
+  test("404: Responds with all the articles with the value of topic that does not exists", () => {
+    return request(app)
+      .get("/api/articles?column_name=topic&&value=3")
+      .expect(404)
+      .then(({ body: { msg } }) => {
+       expect(msg).toBe("Article id not found!!");
+      });
+  });
 });
 
 describe("GET /api/articles/:article_id", () => {

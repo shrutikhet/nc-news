@@ -1,11 +1,20 @@
 const db = require("../db/connection");
 
-const fetchArticles = (sort_by, order) => {
+const fetchArticles = (sort_by, order,column_name,value) => {
   
 
   let selectQuery = `SELECT articles.article_id,articles.title,articles.topic,articles.author,articles.created_at,articles.votes,articles.article_img_url,COUNT(COMMENTS.ARTICLE_ID) as comment_count FROM articles LEFT JOIN comments ON articles.article_id = comments.article_id `;
 
   const groupByQuery = `GROUP BY articles.article_id `;
+
+  let whereQyery = '';
+
+  if(column_name && value) {
+
+    console.log(whereQyery);
+     whereQyery = `WHERE ${column_name} = '${value}' `;
+     console.log(whereQyery);
+  }
 
   let orderByQuery = `ORDER BY articles.created_at desc`;
 
@@ -13,7 +22,7 @@ const fetchArticles = (sort_by, order) => {
     orderByQuery = `ORDER BY articles.${sort_by} ${order}`;
   }
 
-  selectQuery += groupByQuery + orderByQuery;
+  selectQuery += whereQyery + groupByQuery + orderByQuery;
 
   console.log(selectQuery);
 
