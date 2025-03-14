@@ -1,8 +1,9 @@
 const { fetchArticles, fetchArticlesById, updateVotesForArticleId } = require("../model/articles.model");
 
 const getArticles = (request, response, next) => {
-  const {sort_by, order} = request.query;
-  fetchArticles(sort_by, order)
+  const {sort_by, order,column_name,value} = request.query;
+
+  fetchArticles({sort_by, order, column_name,value})
     .then((rows) => {
       if (rows.length === 0) {
         return Promise.reject({ status: 404, msg: "Article id not found!!" });
