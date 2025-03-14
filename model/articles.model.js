@@ -35,7 +35,6 @@ const fetchArticles = (queryParams) => {
     queryParams.sort_by &&
     !defaultQueryParams.possible_column_names.includes(queryParams.sort_by)
   ) {
-    console.log("PRomise reject sort_by:", queryParams);
     return Promise.reject({ status: 404, msg: "Invalid Input" });
   }
 
@@ -47,7 +46,6 @@ const fetchArticles = (queryParams) => {
   }
 
   if (!defaultQueryParams.possible_order.includes(queryParams.order)) {
-    console.log("PRomise reject order:", queryParams);
     return Promise.reject({ status: 404, msg: "Invalid Input" });
   }
 
