@@ -83,9 +83,8 @@ describe("GET /api/articles", () => {
       .get("/api/articles?sort_by=votes&&order=desc")
       .expect(200)
       .then(({ body: { articles } }) => {
-        console.log(articles);
         expect(articles.length).toBe(13);
-        expect(articles[0].votes>= articles[1].votes).toBe(true);
+        expect(articles).toBeSortedBy("votes",{descending: true});
         articles.forEach((article) => {
           expect(typeof article.title).toBe("string");
           expect(typeof article.topic).toBe("string");
@@ -97,14 +96,22 @@ describe("GET /api/articles", () => {
       });
   });
 
+  test("404: Responds with all the articles with sort by bananas order by desc", () => {
+    return request(app)
+      .get("/api/articles?sort_by=bananas&&order=desc")
+      .expect(404)
+      .then(({ body: { msg } }) => {
+        expect(msg).toBe("Invalid Input");
+      });
+  });
+
   test("200: Responds with all the articles with the value of topic", () => {
     return request(app)
       .get("/api/articles?column_name=topic&&value=mitch")
       .expect(200)
       .then(({ body: { articles } }) => {
-        console.log(articles);
         expect(articles.length).toBe(12);
-        expect(articles[0].votes>= articles[1].votes).toBe(true);
+        expect(articles).toBeSortedBy("created_at",{descending:true});
         articles.forEach((article) => {
           expect(typeof article.title).toBe("string");
           expect(article.topic).toBe("mitch");
@@ -121,7 +128,7 @@ describe("GET /api/articles", () => {
       .get("/api/articles?column_name=topic&&value=3")
       .expect(404)
       .then(({ body: { msg } }) => {
-       expect(msg).toBe("Article id not found!!");
+        expect(msg).toBe("Article id not found!!");
       });
   });
 });
@@ -147,6 +154,22 @@ describe("GET /api/articles/:article_id", () => {
       .expect(404)
       .then(({ body: { msg } }) => {
         expect(msg).toBe("Article id not found!!");
+      });
+  });
+  test("200: Responds with the article present for the article id given", () => {
+    return request(app)
+      .get("/api/articles/1")
+      .expect(200)
+      .then(({ body: { article } }) => {
+        expect(typeof article).toBe("object");
+        expect(article.article_id).toBe(1);
+        expect(typeof article.title).toBe("string");
+        expect(typeof article.topic).toBe("string");
+        expect(typeof article.votes).toBe("number");
+        expect(typeof article.author).toBe("string");
+        expect(typeof article.article_img_url).toBe("string");
+        expect(typeof article.comment_count).toBe("string");
+        expect(article.comment_count).toBe("11");
       });
   });
 });
@@ -291,16 +314,14 @@ describe("PATCH /api/articles/:article_id", () => {
 
 describe("DELETE /api/comments/:comment_id", () => {
   test("204 deletes the comments for comment id", () => {
-    return request(app)
-      .delete("/api/comments/1")
-      .expect(204);
+    return request(app).delete("/api/comments/1").expect(204);
   });
 
   test("404: comment id to be deleted not found", () => {
     return request(app)
       .delete("/api/comments/900")
       .expect(404)
-      .then(({body: {msg}}) => {
+      .then(({ body: { msg } }) => {
         expect(msg).toBe("Not Found");
       });
   });
@@ -309,7 +330,7 @@ describe("DELETE /api/comments/:comment_id", () => {
     return request(app)
       .delete("/api/comments/one")
       .expect(400)
-      .then(({body: {msg}}) => {
+      .then(({ body: { msg } }) => {
         expect(msg).toBe("Bad Request!!");
       });
   });
@@ -329,9 +350,3 @@ describe("GET /api/users", () => {
       });
   });
 });
-
-describe("", () => {
-  test("" , () => {
-
-  })
-})

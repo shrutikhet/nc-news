@@ -29,7 +29,7 @@ const getCommentsForArticle = (request, response, next) => {
 const addCommentsForArticle = (request, response, next) => {
   const { article_id } = request.params;
   const { username, body } = request.body;
-  console.log("username:", username, " body:", body);
+
   if (article_id) {
     isArticleIdValid(article_id)
       .then((isValid) => {
@@ -43,7 +43,6 @@ const addCommentsForArticle = (request, response, next) => {
         response.status(201).send({ comment });
       })
       .catch((err) => {
-        console.log("error inside catch:", err);
         next(err);
       });
   }
@@ -54,7 +53,6 @@ const deleteComment = (request, response, next) => {
   if (comment_id) {
     deleteCommentQuery(comment_id)
       .then((rows) => {
-        console.log("In controller after deletion:", rows);
         if (rows && rows.length === 0) {
           return Promise.reject({
             status: 404,

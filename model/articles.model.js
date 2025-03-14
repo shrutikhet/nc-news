@@ -1,30 +1,74 @@
 const db = require("../db/connection");
 
-const fetchArticles = (sort_by, order,column_name,value) => {
-  
+const defaultQueryParams = {
+  sort_by: "created_at",
+  order: "desc",
+  possible_column_names: [
+    "votes",
+    "title",
+    "topic",
+    "author",
+    "body",
+    "created_at",
+    "article_img_url",
+  ],
+  possible_order: ["asc", "desc"],
+  column_name: undefined,
+  value: undefined,
+};
+
+const fetchArticles = (queryParams) => {
+  queryParams.sort_by = !queryParams.sort_by
+    ? defaultQueryParams.sort_by
+    : queryParams.sort_by;
+  queryParams.order = !queryParams.order
+    ? defaultQueryParams.order
+    : queryParams.order;
+  queryParams.column_name = !queryParams.column_name
+    ? defaultQueryParams.column_name
+    : queryParams.column_name;
+  queryParams.value = !queryParams.value
+    ? defaultQueryParams.value
+    : queryParams.value;
+
+  if (
+    queryParams.sort_by &&
+    !defaultQueryParams.possible_column_names.includes(queryParams.sort_by)
+  ) {
+    console.log("PRomise reject sort_by:", queryParams);
+    return Promise.reject({ status: 404, msg: "Invalid Input" });
+  }
+
+  if (
+    queryParams.column_name &&
+    !defaultQueryParams.possible_column_names.includes(queryParams.column_name)
+  ) {
+    return Promise.reject({ status: 404, msg: "Invalid Input" });
+  }
+
+  if (!defaultQueryParams.possible_order.includes(queryParams.order)) {
+    console.log("PRomise reject order:", queryParams);
+    return Promise.reject({ status: 404, msg: "Invalid Input" });
+  }
 
   let selectQuery = `SELECT articles.article_id,articles.title,articles.topic,articles.author,articles.created_at,articles.votes,articles.article_img_url,COUNT(COMMENTS.ARTICLE_ID) as comment_count FROM articles LEFT JOIN comments ON articles.article_id = comments.article_id `;
 
   const groupByQuery = `GROUP BY articles.article_id `;
 
-  let whereQyery = '';
+  let whereQyery = "";
+  let orderByQuery = "";
 
-  if(column_name && value) {
-
-    console.log(whereQyery);
-     whereQyery = `WHERE ${column_name} = '${value}' `;
-     console.log(whereQyery);
+  if (queryParams.column_name && queryParams.value) {
+    whereQyery = `WHERE ${queryParams.column_name} = '${queryParams.value}' `;
+    console.log("where query:", whereQyery);
   }
 
-  let orderByQuery = `ORDER BY articles.created_at desc`;
-
-  if (sort_by && order) {
-    orderByQuery = `ORDER BY articles.${sort_by} ${order}`;
+  if (queryParams.sort_by && queryParams.order) {
+    orderByQuery = `ORDER BY articles.${queryParams.sort_by} ${queryParams.order}`;
+    console.log("orderby query:", orderByQuery);
   }
 
   selectQuery += whereQyery + groupByQuery + orderByQuery;
-
-  console.log(selectQuery);
 
   return db.query(selectQuery).then(({ rows }) => {
     return rows;
@@ -32,13 +76,14 @@ const fetchArticles = (sort_by, order,column_name,value) => {
 };
 
 const fetchArticlesById = (article_id) => {
-  let queryString = `SELECT * FROM articles `;
+  let queryString = `SELECT articles.*, COUNT(comments.comment_id)  as comment_count FROM articles LEFT JOIN comments ON articles.article_id = comments.article_id `;
   const queryParams = [];
 
   if (article_id) {
-    queryString += `WHERE article_id = $1`;
+    queryString += `WHERE articles.article_id = $1 group by articles.article_id`;
     queryParams.push(article_id);
   }
+
   return db.query(`${queryString};`, queryParams).then(({ rows }) => {
     return rows[0];
   });
@@ -64,7 +109,6 @@ const updateVotesForArticleId = (article_id, inc_votes) => {
       [inc_votes, article_id]
     )
     .then(({ rows }) => {
-      console.log("Updated rows are :", rows);
       return rows;
     });
 };
