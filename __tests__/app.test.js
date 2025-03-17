@@ -84,7 +84,7 @@ describe("GET /api/articles", () => {
       .expect(200)
       .then(({ body: { articles } }) => {
         expect(articles.length).toBe(13);
-        expect(articles).toBeSortedBy("votes",{descending: true});
+        expect(articles).toBeSortedBy("votes", { descending: true });
         articles.forEach((article) => {
           expect(typeof article.title).toBe("string");
           expect(typeof article.topic).toBe("string");
@@ -111,7 +111,7 @@ describe("GET /api/articles", () => {
       .expect(200)
       .then(({ body: { articles } }) => {
         expect(articles.length).toBe(12);
-        expect(articles).toBeSortedBy("created_at",{descending:true});
+        expect(articles).toBeSortedBy("created_at", { descending: true });
         articles.forEach((article) => {
           expect(typeof article.title).toBe("string");
           expect(article.topic).toBe("mitch");

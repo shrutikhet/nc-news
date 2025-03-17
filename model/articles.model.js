@@ -58,12 +58,10 @@ const fetchArticles = (queryParams) => {
 
   if (queryParams.column_name && queryParams.value) {
     whereQyery = `WHERE ${queryParams.column_name} = '${queryParams.value}' `;
-    console.log("where query:", whereQyery);
-  }
+   }
 
   if (queryParams.sort_by && queryParams.order) {
     orderByQuery = `ORDER BY articles.${queryParams.sort_by} ${queryParams.order}`;
-    console.log("orderby query:", orderByQuery);
   }
 
   selectQuery += whereQyery + groupByQuery + orderByQuery;
