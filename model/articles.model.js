@@ -1,51 +1,32 @@
 const db = require("../db/connection");
 
-const defaultQueryParams = {
-  sort_by: "created_at",
-  order: "desc",
-  possible_column_names: [
-    "votes",
-    "title",
-    "topic",
-    "author",
-    "body",
-    "created_at",
-    "article_img_url",
-  ],
-  possible_order: ["asc", "desc"],
-  column_name: undefined,
-  value: undefined,
-};
+const possible_column_names = [
+  "votes",
+  "title",
+  "topic",
+  "author",
+  "body",
+  "created_at",
+  "article_img_url",
+];
 
-const fetchArticles = (queryParams) => {
-  queryParams.sort_by = !queryParams.sort_by
-    ? defaultQueryParams.sort_by
-    : queryParams.sort_by;
-  queryParams.order = !queryParams.order
-    ? defaultQueryParams.order
-    : queryParams.order;
-  queryParams.column_name = !queryParams.column_name
-    ? defaultQueryParams.column_name
-    : queryParams.column_name;
-  queryParams.value = !queryParams.value
-    ? defaultQueryParams.value
-    : queryParams.value;
+const possible_order = ["asc", "desc"];
 
-  if (
-    queryParams.sort_by &&
-    !defaultQueryParams.possible_column_names.includes(queryParams.sort_by)
-  ) {
+const fetchArticles = ({
+  sort_by = "created_at",
+  order = "desc",
+  column_name = undefined,
+  value = undefined,
+}) => {
+  if (sort_by && !possible_column_names.includes(sort_by)) {
     return Promise.reject({ status: 404, msg: "Invalid Input" });
   }
 
-  if (
-    queryParams.column_name &&
-    !defaultQueryParams.possible_column_names.includes(queryParams.column_name)
-  ) {
+  if (column_name && !possible_column_names.includes(column_name)) {
     return Promise.reject({ status: 404, msg: "Invalid Input" });
   }
 
-  if (!defaultQueryParams.possible_order.includes(queryParams.order)) {
+  if (!possible_order.includes(order)) {
     return Promise.reject({ status: 404, msg: "Invalid Input" });
   }
 
@@ -56,18 +37,22 @@ const fetchArticles = (queryParams) => {
   let whereQyery = "";
   let orderByQuery = "";
 
-  if (queryParams.column_name && queryParams.value) {
-    whereQyery = `WHERE ${queryParams.column_name} = '${queryParams.value}' `;
-   }
+  if (column_name && value) {
+    whereQyery = `WHERE ${column_name} = '${value}' `;
+  }
 
-  if (queryParams.sort_by && queryParams.order) {
-    orderByQuery = `ORDER BY articles.${queryParams.sort_by} ${queryParams.order}`;
+  if (sort_by && order) {
+    orderByQuery = `ORDER BY articles.${sort_by} ${order}`;
   }
 
   selectQuery += whereQyery + groupByQuery + orderByQuery;
 
   return db.query(selectQuery).then(({ rows }) => {
-    return rows;
+    if (rows.length === 0) {
+      return Promise.reject({ status: 404, msg: "Article id not found!!" });
+    } else {
+      return rows;
+    }
   });
 };
 
@@ -81,7 +66,11 @@ const fetchArticlesById = (article_id) => {
   }
 
   return db.query(`${queryString};`, queryParams).then(({ rows }) => {
-    return rows[0];
+    if (!rows[0]) {
+      return Promise.reject({ status: 404, msg: "Article id not found!!" });
+    } else {
+      return rows[0];
+    }
   });
 };
 
@@ -105,7 +94,14 @@ const updateVotesForArticleId = (article_id, inc_votes) => {
       [inc_votes, article_id]
     )
     .then(({ rows }) => {
-      return rows;
+      if (rows.length === 0) {
+        return Promise.reject({
+          status: 400,
+          msg: "Article id does not exists",
+        });
+      } else {
+        return rows;
+      }
     });
 };
 
